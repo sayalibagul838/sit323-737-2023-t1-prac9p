@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mongodatabasenew
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mongodatabasenew
+  template:
+    metadata:
+      labels:
+        app: mongodatabasenew
+    spec:
+      containers:
+        - image: sayali063/newimage0:new_version
+          name: mongodatabasenew
+          args: ["--dbpath", "/data/db"]
+          env:
+            - name: username
+              valueFrom:
+                secretKeyRef:
+                  name: kubernetes-secret
+                  key: username
+            - name: password
+              valueFrom:
+                secretKeyRef:
+                  name: kubernetes-secret
+                  key: password
+          command: ["node", "server.js"]
+          ports:
+            - containerPort: 3000
+          volumeMounts:
+            - mountPath: /data/db
+              name: mongo-volume
+      volumes:
+        - name: mongo-volume
+          persistentVolumeClaim:
+            claimName: mongo-pvc
+
+            
